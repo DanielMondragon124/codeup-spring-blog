@@ -1,5 +1,7 @@
 package com.codeup.codeupspringblog.controllers;
 
+import com.codeup.codeupspringblog.models.Post;
+import com.codeup.codeupspringblog.repositories.PostRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -8,48 +10,43 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@RequestMapping("/posts")
 public class PostController {
-    @GetMapping("/all")
-    public String allPosts(Model model) {
-        // Create two sample posts and add them to the list
-        List<Post> posts = new ArrayList<>();
-        Post post1 = new Post();
-        post1.setTitle("Post 1");
-        post1.setBody("This is the content of post 1.");
-        posts.add(post1);
 
-        Post post2 = new Post();
-        post2.setTitle("Post 2");
-        post2.setBody("This is the content of post 2.");
-        posts.add(post2);
 
-        // Pass the list of posts to the view
+    private final PostRepository postDao;
+
+    public PostController(PostRepository postDao) {
+        this.postDao = postDao;
+    }
+
+
+    @GetMapping("/posts")
+    public String postsHome(Model model) {
+        List<Post> posts = postDao.findAll();
         model.addAttribute("posts", posts);
-
-        return "index";
+        return "posts/index";
     }
 
-    @GetMapping("/{id}")
-    public String viewPost(@PathVariable int id, Model model) {
-        // Create a sample post for demonstration
-        Post post = new Post();
-        post.setTitle("Sample Post");
-        post.setBody("This is the content of the sample post.");
 
-        // Pass the post object to the view
+    @GetMapping("/posts/{id}")
+    public String postsHome(@PathVariable long id, Model model) {
+        Post post = postDao.findPostById(id);
         model.addAttribute("post", post);
-
-        return "show";
+        return "posts/show";
     }
 
-    @GetMapping("/create")
-    public String createPostsForm() {
-        return "view the form for creating a post";
+    @GetMapping("/posts/create")
+    public String postsForm(Model model) {
+        model.addAttribute("post", new Post());
+        model.addAttribute("heading", "Create new post.");
+        return "posts/create";
     }
-
-    @PostMapping("/create")
-    public String createPost() {
-        return "create a new post";
+    @PostMapping("/posts/save")
+    public String createPost(@ModelAttribute Post post) {
+        Post origPost = postDao.findPostById(post.getId());
+        if(origPost == null) {
+            postDao.save(post);
+        }
+        return "redirect:/posts/index";
     }
 }
