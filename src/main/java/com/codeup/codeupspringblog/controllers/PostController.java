@@ -2,6 +2,7 @@ package com.codeup.codeupspringblog.controllers;
 
 import com.codeup.codeupspringblog.models.Post;
 import com.codeup.codeupspringblog.repositories.PostRepository;
+import com.codeup.codeupspringblog.repositories.userRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,6 @@ public class PostController {
     public PostController(PostRepository postDao) {
         this.postDao = postDao;
     }
-
 
     @GetMapping("/posts")
     public String postsHome(Model model) {
@@ -41,12 +41,23 @@ public class PostController {
         model.addAttribute("heading", "Create new post.");
         return "posts/create";
     }
-    @PostMapping("/posts/save")
-    public String createPost(@ModelAttribute Post post) {
-        Post origPost = postDao.findPostById(post.getId());
-        if(origPost == null) {
-            postDao.save(post);
-        }
-        return "redirect:/posts/index";
+//    @PostMapping("/posts/save")
+//    public String createPost(@ModelAttribute Post post) {
+//        Post origPost = postDao.findPostById(post.getId());
+//        if (post.getId() == null) {
+//            postDao.save(post);
+//        }
+//        return "redirect:/posts/" + post.getId();
+//    }
+@PostMapping("/posts/save")
+public String createPost(@ModelAttribute Post post) {
+    if (post.getId() == null) {
+        postDao.save(post);
     }
+    return "redirect:/posts";
+}
+
+
+
+
 }

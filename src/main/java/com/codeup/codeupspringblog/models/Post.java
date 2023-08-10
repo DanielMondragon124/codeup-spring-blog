@@ -14,6 +14,9 @@ public class Post {
 
     @Column(nullable = false)
     private String body;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private user user;
 
     public Post() {
     }
@@ -51,5 +54,13 @@ public class Post {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public com.codeup.codeupspringblog.models.user getUser() {
+        return user;
+    }
+
+    public void setUser(com.codeup.codeupspringblog.models.user user) {
+        this.user = user;
     }
 }
