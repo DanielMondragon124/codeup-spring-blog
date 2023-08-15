@@ -6,11 +6,13 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-public class user {
+public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-@Column(nullable = false)
+    private long id;
+
+    @Column(nullable = false)
     private String username;
 
     @Column(nullable = false)
@@ -19,24 +21,34 @@ public class user {
     @Column(nullable = false)
     private String password;
 
-    @OneToMany(cascade = CascadeType.PERSIST,mappedBy = "user")
+    @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "user")
     private List<Post> posts;
 
-    public user(String username, String email, String password) {
+
+    public User(long id, String username, String email, String password, List<Post> posts) {
+        this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
+        this.posts = posts;
     }
 
-    public user() {
+    public User(String username, String email, String password, List<Post> posts) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.posts = posts;
+    }
+
+    public User() {
 
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -64,16 +76,6 @@ public class user {
         this.password = password;
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                '}';
-    }
-
     public List<Post> getPosts() {
         return posts;
     }
@@ -81,4 +83,5 @@ public class user {
     public void setPosts(List<Post> posts) {
         this.posts = posts;
     }
+
 }

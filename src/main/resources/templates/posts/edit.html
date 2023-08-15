@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head th:replace="partials :: head ('Viewing an Ad')">
-    <title></title>
+<head th:replace="~{partials :: head ('Edit Post')}">
 </head>
-<body class="main-bg main-container">
+<body class="main-container main-bg">
 <nav th:replace="partials :: navbar"></nav>
+<header th:replace="partials :: header('Edit Post')"></header>
 <main class="container">
-    <div th:each="post : ${posts}">
-        <a th:href="@{/posts/{id} (id = ${post.id})}"><h1 th:text="${post.title}"></h1></a>
-        <p th:text="${post.body}"></p>
-    </div>
+  <form th:replace="partials :: postsForm(@{/posts/{id}/edit(id=${post.id})}, 'Update Post')"></form>
 </main>
 <footer th:replace="partials :: footer"></footer>
 <div th:replace="partials :: boot-scripts"></div>
