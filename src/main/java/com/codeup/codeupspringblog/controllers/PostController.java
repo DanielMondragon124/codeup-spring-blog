@@ -4,68 +4,64 @@ import com.codeup.codeupspringblog.models.Post;
 import com.codeup.codeupspringblog.models.User;
 import com.codeup.codeupspringblog.repositories.PostRepository;
 import com.codeup.codeupspringblog.repositories.UserRepository;
+import com.codeup.codeupspringblog.services.EmailService;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 public class PostController {
 
-
     private final PostRepository postDao;
+
     private final UserRepository userDao;
 
-    public PostController(PostRepository postDao, UserRepository userDao) {
+    private final EmailService emailService;
+
+    public PostController(PostRepository postDao, UserRepository userDao, EmailService emailService) {
         this.postDao = postDao;
         this.userDao = userDao;
+        this.emailService = emailService;
     }
 
     @GetMapping("/posts")
-    public String postsHome(Model model) {
-        List<Post> posts = postDao.findAll();
-        model.addAttribute("posts", posts);
+    public String index(Model model) {
+        model.addAttribute("posts", postDao.findAll());
         return "posts/index";
     }
 
 
     @GetMapping("/posts/{id}")
-    public String postsHome(@PathVariable long id, Model model) {
-        Post post = postDao.findPostById(id);
-        model.addAttribute("post", post);
+    public String postId(@PathVariable long id, Model model) {
+        model.addAttribute("post", postDao.getById(id));
         return "posts/show";
     }
 
     @GetMapping("/posts/{id}/edit")
-    public String postsEdit(@PathVariable long id, Model model) {
-        Post post = postDao.findPostById(id);
-        model.addAttribute("post", post);
+    public String postEdit(@PathVariable long id, Model model) {
+        model.addAttribute("post", postDao.getById(id));
         return "posts/edit";
     }
 
-    @PostMapping("/posts/{id}/edit")
-    public String postsUpdate(@ModelAttribute Post post, @PathVariable long id) {
-        Post postToUpdate = postDao.findPostById(id);
-        postToUpdate.setTitle(post.getTitle());
-        postToUpdate.setBody(post.getBody());
-        postDao.save(postToUpdate);
-        return "redirect:/posts";
-    }
 
     @GetMapping("/posts/create")
-    public String postsForm(Model model) {
+    public String postsCreate(Model model) {
         model.addAttribute("post", new Post());
-        model.addAttribute("heading", "Create new post.");
         return "posts/create";
     }
-@PostMapping("/posts/save")
-public String createPost(@ModelAttribute Post post) {
-    User user = userDao.findById(1L).get();
-    post.setUser(user);
-    postDao.save(post);
-    return "redirect:/posts";
-}
 
+    @PostMapping("/posts/create")
+    public String createPostPost(@ModelAttribute Post post){
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        post.setUser(user);
+        postDao.save(post);
+        emailService.prepareAndSend(post, user.getUsername()
+                + " thanks for creating a post!", user.getUsername()
+                + " thanks for creating the post: " + post.getTitle());
+        return "redirect:/posts";
+    }
 }

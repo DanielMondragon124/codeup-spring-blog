@@ -5,14 +5,14 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "users")
+@Table(name="users")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String username;
 
     @Column(nullable = false)
@@ -24,13 +24,13 @@ public class User {
     @OneToMany(cascade = CascadeType.PERSIST, mappedBy = "user")
     private List<Post> posts;
 
+    public User() {
+    }
 
-    public User(long id, String username, String email, String password, List<Post> posts) {
-        this.id = id;
+    public User(String username, String email, String password) {
         this.username = username;
         this.email = email;
         this.password = password;
-        this.posts = posts;
     }
 
     public User(String username, String email, String password, List<Post> posts) {
@@ -40,8 +40,19 @@ public class User {
         this.posts = posts;
     }
 
-    public User() {
+    public User(long id, String username, String email, String password, List<Post> posts) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.posts = posts;
+    }
 
+    public User(User copy) {
+        id = copy.id; // This line is SUPER important! Many things won't work if it's absent
+        email = copy.email;
+        username = copy.username;
+        password = copy.password;
     }
 
     public long getId() {
@@ -83,5 +94,4 @@ public class User {
     public void setPosts(List<Post> posts) {
         this.posts = posts;
     }
-
 }
